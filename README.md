@@ -5,7 +5,6 @@
 - h5py
 - yacs
 - terminaltables
-- tqdm
 - transformers
 
 ## Start

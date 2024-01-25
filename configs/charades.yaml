@@ -40,15 +40,15 @@ MODEL:
       THRESH: 0.1
 DATASETS:
   NAME: "charades"
-  TRAIN: ("charades_train", )
-  TEST: ("charades_test", )
+  TRAIN: ("charades_train")
+  TEST: ("charades_test")
 INPUT:
   NUM_PRE_CLIPS: 32
 DATALOADER:
   NUM_WORKERS: 16
 SOLVER:
   LR: 0.0001
-  BATCH_SIZE: 24 
+  BATCH_SIZE: 24
   MILESTONES: (8, 13)
   MAX_EPOCH: 18
   TEST_PERIOD: 1

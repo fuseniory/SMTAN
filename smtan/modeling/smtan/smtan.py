@@ -228,3 +228,4 @@ class SMTAN(nn.Module):
                 contrastive_scores.append(contrastive_score)
 
             return map2d_iou, sent_feat_iou, contrastive_scores, iou_scores, loss
+

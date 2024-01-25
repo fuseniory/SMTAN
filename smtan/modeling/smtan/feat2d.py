@@ -88,7 +88,6 @@ class SparseMaxPool(nn.Module):
 class SparseConv(nn.Module):
     pass
 
-
 def build_feat2d(cfg):
     pooling_counts = cfg.MODEL.SMTAN.FEAT2D.POOLING_COUNTS
     num_clips = cfg.MODEL.SMTAN.NUM_CLIPS

@@ -39,8 +39,8 @@ MODEL:
       THRESH: 0.2
 DATASETS:
   NAME: "activitynet"
-  TRAIN: ("activitynet_train", )
-  TEST: ("activitynet_test", )
+  TRAIN: ("activitynet_train")
+  TEST: ("activitynet_test")
 INPUT:
   NUM_PRE_CLIPS: 256
 DATALOADER:
