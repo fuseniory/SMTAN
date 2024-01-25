@@ -43,11 +43,21 @@ class SparseMaxPool(nn.Module):
         B, D, N = x.shape
 
         boundary_map2d = x.new_zeros(B, D, N, N)
+        local_map2d = x.new_zeros(B, D, N, N)
         content_map2d = x.new_zeros(B, D, N, N)
         mask2d = self.mask2d.unsqueeze(0).unsqueeze(0).repeat(B, 1, 1, 1)
 
         content_map2d[:, :, range(N), range(N)] = x
+        local_map2d[:, :, range(N), range(N)] = x
         boundary_map2d[:, :, range(N), range(N)] = x
+        for (i, j) in self.maskij:
+            i_mask = x[:, :, i]
+            i_mask = i_mask.transpose(1, 2)
+            i_mask = i_mask.transpose(1, 2)
+            j_mask = x[:, :, j]
+            j_mask = j_mask.transpose(1, 2)
+            j_mask = j_mask.transpose(1, 2)
+            boundary_map2d[:, :, i, j] = (i_mask + j_mask) / 2
         for (i, j) in self.maskij:
             m = list(i)
             n = list(j)
@@ -55,11 +65,11 @@ class SparseMaxPool(nn.Module):
             i_mask = x[:, :, i]
             k_mask = x[:, :, k]
             j_mask = x[:, :, j]
-            boundary_map2d[:, :, i, j] = (i_mask + j_mask + 0.5 * k_mask) / 2.5
-
+            local_map2d[:, :, i, j] = (i_mask + j_mask + 0.5 * k_mask) / 2.5
         for pooler, (i, j) in zip(self.poolers, self.maskij):
             x = pooler(x)
             content_map2d[:, :, i, j] = x
+
         B, nseg, _ = m_feats.size()
         m_k = self.v_lin(self.drop(m_feats))
         m_trans = self.c_lin(self.drop(m_feats))
@@ -69,7 +79,7 @@ class SparseMaxPool(nn.Module):
         m2m_w = m2m_w.unsqueeze(1)
 
         boundary_map2d = boundary_map2d + boundary_map2d * m2m_w
-        local_map2d = boundary_map2d
+        local_map2d = local_map2d + local_map2d * m2m_w
         content_map2d = content_map2d + content_map2d * m2m_w
 
         return boundary_map2d, local_map2d, content_map2d, mask2d
