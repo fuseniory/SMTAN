@@ -7,7 +7,6 @@ class SparseMaxPool(nn.Module):
         super(SparseMaxPool, self).__init__()
         mask2d = torch.zeros(N, N, dtype=torch.bool)
         mask2d[range(N), range(N)] = 1
-
         stride, offset = 1, 0
         maskij = []
         for c in pooling_counts:
@@ -17,13 +16,11 @@ class SparseMaxPool(nn.Module):
                 mask2d[i, j] = 1
                 maskij.append((i, j))
             stride *= 2
-
         poolers = [nn.MaxPool1d(2, 1) for _ in range(pooling_counts[0])]
         for c in pooling_counts[1:]:
             poolers.extend(
                 [nn.MaxPool1d(3, 2)] + [nn.MaxPool1d(2, 1) for _ in range(c - 1)]
             )
-
         self.mask2d = mask2d.to("cuda")
         self.maskij = maskij
         self.poolers = poolers
@@ -33,7 +30,6 @@ class SparseMaxPool(nn.Module):
         self.use_bias = True
         self.c_lin = nn.Linear(self.idim, self.odim * 2, bias=self.use_bias)
         self.v_lin = nn.Linear(self.idim, self.odim, bias=self.use_bias)
-
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
         self.drop = nn.Dropout(0.5)
@@ -41,12 +37,10 @@ class SparseMaxPool(nn.Module):
     def forward(self, x):
         m_feats = x.transpose(1, 2)
         B, D, N = x.shape
-
         boundary_map2d = x.new_zeros(B, D, N, N)
         local_map2d = x.new_zeros(B, D, N, N)
         content_map2d = x.new_zeros(B, D, N, N)
         mask2d = self.mask2d.unsqueeze(0).unsqueeze(0).repeat(B, 1, 1, 1)
-
         content_map2d[:, :, range(N), range(N)] = x
         local_map2d[:, :, range(N), range(N)] = x
         boundary_map2d[:, :, range(N), range(N)] = x
@@ -69,7 +63,6 @@ class SparseMaxPool(nn.Module):
         for pooler, (i, j) in zip(self.poolers, self.maskij):
             x = pooler(x)
             content_map2d[:, :, i, j] = x
-
         B, nseg, _ = m_feats.size()
         m_k = self.v_lin(self.drop(m_feats))
         m_trans = self.c_lin(self.drop(m_feats))
@@ -77,16 +70,10 @@ class SparseMaxPool(nn.Module):
         m2m = m_k @ m_q.transpose(1, 2) / ((self.odim // self.nheads) ** 0.5)
         m2m_w = torch.nn.functional.softmax(m2m, dim=2)
         m2m_w = m2m_w.unsqueeze(1)
-
         boundary_map2d = boundary_map2d + boundary_map2d * m2m_w
         local_map2d = local_map2d + local_map2d * m2m_w
         content_map2d = content_map2d + content_map2d * m2m_w
-
         return boundary_map2d, local_map2d, content_map2d, mask2d
-
-
-class SparseConv(nn.Module):
-    pass
 
 def build_feat2d(cfg):
     pooling_counts = cfg.MODEL.SMTAN.FEAT2D.POOLING_COUNTS

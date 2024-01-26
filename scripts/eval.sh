@@ -1,22 +1,16 @@
-# find all configs in configs/
-# config_file=configs/charades.yaml
+
+
 config_file=configs/activitynet.yaml
-
-# the dir of the saved weight
-# weight_dir=checkpoints/charades/
 weight_dir=outputs/activitynet/
-
-# select weight to evaluate
-# weight_file=checkpoints/charades/best_charades.pth
 weight_file=outputs/activitynet/pool_model_7e.pth
 
-# test batch size
+
 batch_size=20
-# set your gpu id
+
 gpus=1
-# number of gpus
+
 gpun=3
-# please modify it with different value (e.g., 127.0.0.2, 29502) when you run multi task on the same machine
+
 master_addr=127.0.0.2
 master_port=28578
 

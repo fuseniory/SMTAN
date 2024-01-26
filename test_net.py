@@ -30,40 +30,30 @@ def main():
         default=None,
         nargs=argparse.REMAINDER,
     )
-
     args = parser.parse_args()
-
     num_gpus = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     distributed = num_gpus > 1
-
     if distributed:
         torch.cuda.set_device(args.local_rank)
         torch.distributed.init_process_group(
             backend="nccl", init_method="env://"
         )
         synchronize()
-
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
-
     save_dir = ""
     logger = setup_logger("smtan", save_dir, get_rank())
     logger.info("Using {} GPUs".format(num_gpus))
     logger.info(cfg)
-    
     model = build_model(cfg)
     model.to(cfg.MODEL.DEVICE)
     model.eval()
-
-    # for epoch in [10, 11, 9, 12, 8, 13, 7, 14, 6, 15, 5, 16, 4, 17, 3, 18, 2, 1]:
     output_dir = cfg.OUTPUT_DIR
     checkpointer = TrmCheckpointer(cfg, model, save_dir=output_dir)
     ckpt = cfg.MODEL.WEIGHT if args.ckpt is None else args.ckpt
-    # ckpt.replace('pool_model_12e.pth', 'pool_model_%de.pth'%epoch)
     logger.info("load from %s"%ckpt)
     _ = checkpointer.load(ckpt, use_latest=args.ckpt is None)
-
     dataset_names = cfg.DATASETS.TEST
     data_loaders_val = make_data_loader(cfg, is_train=False, is_distributed=distributed)
     _ = inference(

@@ -44,7 +44,7 @@ def make_data_sampler(dataset, shuffle, distributed):
 def make_train_data_sampler(dataset, sampler, batch_size):
     batch_sampler = torch.utils.data.sampler.BatchSampler(
         sampler, batch_size, drop_last=False
-        # TODO: check if drop_last=True helps
+        
     )
     return batch_sampler
 
@@ -72,7 +72,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, is_for_period=Fal
         ), "TEST.BATCH_SIZE ({}) must be divisible by the number of GPUs ({}) used.".format(
             batch_size, num_gpus)
         batch_size_per_gpu = batch_size // num_gpus
-        # shuffle = True if not is_distributed else False  # originally False
+        
         shuffle = False
 
     if batch_size_per_gpu > 1:

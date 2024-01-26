@@ -1,6 +1,4 @@
-"""Centralized catalog of paths."""
 import os
-
 class DatasetCatalog(object):
     DATA_DIR = ""
 
@@ -47,16 +45,10 @@ class DatasetCatalog(object):
         data_dir = DatasetCatalog.DATA_DIR
         attrs = DatasetCatalog.DATASETS[name]
         args = dict(
-            #root=os.path.join(data_dir, attrs["video_dir"]),
             ann_file=os.path.join(data_dir, attrs["ann_file"]),
             feat_file=os.path.join(data_dir, attrs["feat_file"]),
         )
-        if "tacos" in name:
-            return dict(
-                factory="TACoSDataset",
-                args=args,
-            )
-        elif "activitynet" in name:
+        if "activitynet" in name:
             return dict(
                 factory = "ActivityNetDataset",
                 args = args
@@ -64,11 +56,6 @@ class DatasetCatalog(object):
         elif "charades" in name:
             return dict(
                 factory = "CharadesDataset",
-                args = args
-            )
-        elif "didemo" in name:
-            return dict(
-                factory = "DidemoDataset",
                 args = args
             )
         raise RuntimeError("Dataset not available: {}".format(name))

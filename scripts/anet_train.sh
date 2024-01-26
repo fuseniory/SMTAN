@@ -1,14 +1,12 @@
-# find all configs in configs/
+
 config=activitynet
-# set your gpu id
 gpus=2,3
-# number of gpus
 gpun=2
-# please modify it with different value (e.g., 127.0.0.2, 29502) when you run multi mmn task on the same machine
+
 master_addr=127.0.0.3
 master_port=29950
 
-# ------------------------ need not change -----------------------------------
+
 config_file=configs/$config\.yaml
 output_dir=outputs/$config
 

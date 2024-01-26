@@ -25,7 +25,7 @@ def train(cfg, local_rank, distributed):
     if distributed:
         model = torch.nn.parallel.DistributedDataParallel(
             model, device_ids=[local_rank], output_device=local_rank,
-            # this should be removed if we update BatchNorm stats
+            
             broadcast_buffers=False, find_unused_parameters=True
         )
     learning_rate = cfg.SOLVER.LR * 1.0
@@ -62,8 +62,6 @@ def train(cfg, local_rank, distributed):
         model.load_state_dict(weight_file.pop("model"), strict=False)
         for _ in range(1, cfg.SOLVER.RESUME_EPOCH):
             scheduler.step()
-        # optimizer.load_state_dict(weight_file.pop('optimizer'))
-        # scheduler.load_state_dict(weight_file.pop('scheduler'))
 
     test_period = cfg.SOLVER.TEST_PERIOD
     if test_period > 0:
@@ -136,39 +134,30 @@ def main():
     random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-
     num_gpus = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     args.distributed = num_gpus > 1
-
     if args.distributed:
         torch.cuda.set_device(args.local_rank)
         torch.distributed.init_process_group(
             backend="nccl", init_method="env://"
         )
         synchronize()
-
     cfg.merge_from_file(args.config_file)
     cfg.merge_from_list(args.opts)
     cfg.freeze()
-
     output_dir = cfg.OUTPUT_DIR
     if output_dir:
         mkdir(output_dir)
-
     logger = setup_logger("smtan", output_dir, get_rank())
     logger.info("Using {} GPUs".format(num_gpus))
     logger.info(args)
-
     logger.info("Loaded configuration file {}".format(args.config_file))
     with open(args.config_file, "r") as cf:
         config_str = "\n" + cf.read()
         logger.info(config_str)
     logger.info("Running with config:\n{}".format(cfg))
-
     output_config_path = os.path.join(cfg.OUTPUT_DIR, 'config.yml')
     logger.info("Saving config into: {}".format(output_config_path))
-    # save overloaded model config in the output directory
     save_config(cfg, output_config_path)
 
     model = train(cfg, args.local_rank, args.distributed)

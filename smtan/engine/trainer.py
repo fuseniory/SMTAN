@@ -5,12 +5,9 @@ import time
 import gc
 import torch
 import torch.distributed as dist
-
-from smtan.data import make_data_loader
 from smtan.utils.comm import get_world_size, synchronize
 from smtan.utils.metric_logger import MetricLogger
 from smtan.engine.inference import inference
-from ..utils.comm import is_main_process
 
 
 def reduce_loss(loss):

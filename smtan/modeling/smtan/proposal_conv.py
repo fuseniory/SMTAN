@@ -3,7 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 
 def mask2weight(mask2d, mask_kernel, padding=0):
-    # from the feat2d.py,we can know the mask2d is 4-d: B, D, N, N
+    
     weight = F.conv2d(mask2d[None, None, :, :].float(),
                           mask_kernel, padding=padding)[0, 0]
     weight[weight > 0] = 1 / weight[weight > 0]
@@ -12,7 +12,7 @@ def mask2weight(mask2d, mask_kernel, padding=0):
 
 def get_padded_mask_and_weight(mask, conv):
     masked_weight = torch.round(F.conv2d(mask.clone().float(), torch.ones(1, 1, *conv.kernel_size).cuda(), stride=conv.stride, padding=conv.padding, dilation=conv.dilation))
-    masked_weight[masked_weight > 0] = 1 / masked_weight[masked_weight > 0]  #conv.kernel_size[0] * conv.kernel_size[1]
+    masked_weight[masked_weight > 0] = 1 / masked_weight[masked_weight > 0]  
     padded_mask = masked_weight > 0
     return padded_mask, masked_weight
 
@@ -22,7 +22,7 @@ class ProposalConv(nn.Module):
         self.num_stack_layers = num_stack_layers
         self.dataset = dataset
         self.mask2d = mask2d[None, None,:,:]
-        # Padding to ensure the dimension of the output map2d
+        
         first_padding = (k - 1) * num_stack_layers // 2
         self.bn = nn.ModuleList([nn.BatchNorm2d(hidden_size)])
         self.convs = nn.ModuleList(

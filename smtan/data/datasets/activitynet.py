@@ -51,7 +51,7 @@ class ActivityNetDataset(torch.utils.data.Dataset):
                     phrases.append(new_phrase)
             moments = torch.stack(moments)
             all_iou2d = torch.stack(all_iou2d)
-            queries, word_lens = bert_embedding(sentences, tokenizer)  # padded query of N*word_len, tensor of size = N
+            queries, word_lens = bert_embedding(sentences, tokenizer)
             
             assert moments.size(0) == all_iou2d.size(0)
             assert moments.size(0) == queries.size(0)
