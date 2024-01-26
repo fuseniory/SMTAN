@@ -1,4 +1,4 @@
-### Training
+## Train
 To train on the Charades-STA dataset:
 ```bash
 sh scripts/charades_train.sh
@@ -10,7 +10,7 @@ sh scripts/anet_train.sh
 ```
 
 
-### Inference
+## Inference
 
 Run the following commands for evaluation:
 ```bash
