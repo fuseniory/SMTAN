@@ -5,7 +5,7 @@ import sys
 def setup_logger(name, save_dir, distributed_rank, filename="log.txt"):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-    # don't log results for the non-master process
+    
     if distributed_rank > 0:
         return logger
     ch = logging.StreamHandler(stream=sys.stdout)

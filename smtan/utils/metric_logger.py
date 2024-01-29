@@ -1,4 +1,3 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
 from collections import defaultdict
 from collections import deque
 
@@ -6,19 +5,15 @@ import torch
 
 
 class SmoothedValue(object):
-    """Track a series of values and provide access to smoothed values over a
-    window or the global series average.
-    """
-
     def __init__(self, window_size=10):
         self.deque = deque(maxlen=window_size)
-        #self.series = []
+        
         self.total = 0.0
         self.count = 0
 
     def update(self, value):
         self.deque.append(value)
-        #self.series.append(value)
+        
         self.count += 1
         self.total += value
 
@@ -65,5 +60,5 @@ class MetricLogger(object):
     def __str__(self):
         loss_str = []
         for name, meter in self.meters.items():
-            loss_str.append("{}: {:.2f} ".format(name, meter.avg))  # ({:.2f}) meter.median,
+            loss_str.append("{}: {:.2f} ".format(name, meter.avg))  
         return self.delimiter.join(loss_str)

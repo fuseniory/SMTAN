@@ -1,6 +1,3 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
-
-
 import time
 import datetime
 
@@ -14,8 +11,8 @@ class Timer(object):
         return self.total_time / self.calls if self.calls > 0 else 0.0
 
     def tic(self):
-        # using time.time instead of time.clock because time time.clock
-        # does not normalize for multithreading
+        
+        
         self.start_time = time.time()
 
     def toc(self, average=True):
